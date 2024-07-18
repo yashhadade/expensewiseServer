@@ -18,7 +18,12 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        validate: {
+            validator: (val) => val.length >= 8,
+            message: 'password should be 8 digits'
+        }
+
     },
     organization: {
         type: mongoose.Schema.Types.ObjectId,
@@ -55,12 +60,12 @@ userSchema.methods.matchPassword = function (oldPassword, callback) {
     })
 }
 
-userSchema.statics.findByEmailAndPass = async ({email,password})=>{
-    const user = await userModel.findOne({email});
-    if(!user)throw new Error("user not exist");
+userSchema.statics.findByEmailAndPass = async ({ email, password }) => {
+    const user = await userModel.findOne({ email });
+    if (!user) throw new Error("user not exist");
 
-    const checkPassword = await bcrypt.compare(password,user.password);
-    if(!checkPassword){
+    const checkPassword = await bcrypt.compare(password, user.password);
+    if (!checkPassword) {
         throw new Error("invalid credentials")
     }
     return user;

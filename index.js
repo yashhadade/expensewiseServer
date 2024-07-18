@@ -5,10 +5,17 @@ import DBConnect from "./DBModel/DBConnection.js"
 import cors from "cors";
 import bodyParser from "body-parser";
 import expensesAPI from "./API/expenses/index.js"
+import userAPI from "./API/user/index.js";
+import organizationAPI from './API/organization/index.js';
+import privateConfig from "./Config/routeConfig.js";
+import passport from "passport";
+import session from "express-session";
+
+
 dotenv.config();
 
 const app = express();
-
+privateConfig(passport);
 app.use(express.json());
 const corsOptions = {
     origin: "*",
@@ -17,9 +24,11 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
+app.use(session({ secret: "newProject" }));
 app.use(bodyParser.json());
 app.use("/expenses", expensesAPI);
+app.use("/user", userAPI);
+app.use("/organization", organizationAPI);
 
 app.listen(8000, () => {
     DBConnect().then(() => {
