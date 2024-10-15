@@ -142,4 +142,22 @@ Router.put('/AddOrg', passport.authenticate("jwt", { session: false }), async (r
   }
 });
 
+
+Router.post("/auth", async (req, res) => {
+  try {
+      const user = await userModel.findByEmail(req, res);
+    if (!user) {
+      const newUser = await userModel.create(req.body);
+      return res.status(200).json({ message: "Signup successfully", newUser })
+    }
+
+  } catch (error) {
+    console.log(error);
+
+    return res.status(404).json({ message: "Somthing went wrong", error })
+  }
+
+
+
+})
 export default Router;

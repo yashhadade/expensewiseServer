@@ -18,7 +18,6 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
         validate: {
             validator: (val) => val.length >= 8,
             message: 'password should be 8 digits'
@@ -28,6 +27,10 @@ const userSchema = new mongoose.Schema({
     organization: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Organization"
+    },
+    role: {
+        type: String, // accountant, co-accontant,member
+        // required: true
     },
     resetPasswordToken: String,
     resetPasswordExipre: String
@@ -45,10 +48,11 @@ userSchema.methods.getResetToken = function () {
     return resetToken;
 }
 
-userSchema.statics.findByEmail = async ({ email }) => {
+userSchema.statics.findByEmail = async (req, res) => {
+    const { email } = req.body
     const checkEmail = await userModel.findOne({ email });
     if (checkEmail) {
-        throw new Error("User already exist...")
+        return res.status(202).json({ message: "User already exist" })
     }
     return false;
 }
