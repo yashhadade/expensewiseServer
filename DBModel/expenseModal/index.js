@@ -27,6 +27,10 @@ const expensesSchema = new mongoose.Schema(
                 validator: (val) => moment(val, 'YYYY-MM-DD', true).isValid(),
                 message: 'Invalid date format, should be YYYY-MM-DD'
             }
+        },
+        feildId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "expenseField"
         }
     }
 )

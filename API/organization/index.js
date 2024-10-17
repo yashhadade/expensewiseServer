@@ -27,7 +27,6 @@ Router.post("/signin", async (req, res) => {
     }
 })
 
-
 Router.get("/getOrg", passport.authenticate("jwt", { session: false }), async (req, res) => {
     try {
         const { name, email, _id,users } = req.user;

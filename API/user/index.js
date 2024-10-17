@@ -29,14 +29,16 @@ async function addUSerToOrg(userID) {
       throw new Error("User already exist");
     }
   } catch (error) {
-    console.log(error);
+    return res.status(400).json({ message: "Somthing went wrong", error: error.message })
   }
 }
 
 
 Router.post("/signup", async (req, res) => {
   try {
-    await userModel.findByEmail(req.body);
+    // console.log(req.body);
+
+    await userModel.findByEmail(req, res);
     const newUser = await userModel.create(req.body);
 
     if (newUser.organization) {
@@ -145,14 +147,20 @@ Router.put('/AddOrg', passport.authenticate("jwt", { session: false }), async (r
 
 Router.post("/auth", async (req, res) => {
   try {
-      const user = await userModel.findByEmail(req, res);
+    const user = await userModel.findByEmail(req, res);
     if (!user) {
       const newUser = await userModel.create(req.body);
-      return res.status(200).json({ message: "Signup successfully", newUser })
+      const token = newUser.genrateJwtToken();
+      return res.status(200).json({ message: "Signup successfully", token })
+    } else {
+      const token = user.genrateJwtToken();
+      return res.status(200).json({ message: "Signup successfully", token })
+
     }
 
+
   } catch (error) {
-    console.log(error);
+    return res.status(400).json({ message: "Somthing went wrong", error: error.message })
 
     return res.status(404).json({ message: "Somthing went wrong", error })
   }
@@ -160,4 +168,6 @@ Router.post("/auth", async (req, res) => {
 
 
 })
+
+
 export default Router;

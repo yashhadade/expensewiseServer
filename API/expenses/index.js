@@ -5,7 +5,7 @@ const Router = express.Router();
 
 Router.post("/addexpense", async (req, res) => {
     try {
-        console.log(req.body);
+       
         const newExpense = await expenseModal.create(req.body);
         return res.status(201).json({ status: "expense Created", newExpense })
     } catch (error) {
@@ -37,8 +37,7 @@ Router.put("/udpateExpense/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const oldData  = req.body;
-        console.log(req.body);
-
+     
         const updatedExpenses = await expenseModal.findByIdAndUpdate(id, oldData, {
             new: true,
             runValidators: true,

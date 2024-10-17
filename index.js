@@ -1,5 +1,4 @@
 import express from "express";
-import mongoose from "mongoose";
 import dotenv from "dotenv";
 import DBConnect from "./DBModel/DBConnection.js"
 import cors from "cors";
@@ -7,6 +6,7 @@ import bodyParser from "body-parser";
 import expensesAPI from "./API/expenses/index.js"
 import userAPI from "./API/user/index.js";
 import organizationAPI from './API/organization/index.js';
+import expenseFeildAPI from "./API/ExpenseField/index.js"
 import privateConfig from "./Config/routeConfig.js";
 import passport from "passport";
 import session from "express-session";
@@ -29,6 +29,7 @@ app.use(bodyParser.json());
 app.use("/expenses", expensesAPI);
 app.use("/user", userAPI);
 app.use("/organization", organizationAPI);
+app.use("/field", expenseFeildAPI)
 
 app.listen(8000, () => {
     DBConnect().then(() => {

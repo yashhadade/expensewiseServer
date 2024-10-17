@@ -12,6 +12,7 @@ const options = {
 };
 
 export default (passport) => {
+
     passport.use(
         new JWTStrategy(options, async (jwt__payload, done) => {
             try {

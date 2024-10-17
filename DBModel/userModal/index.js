@@ -24,10 +24,10 @@ const userSchema = new mongoose.Schema({
         }
 
     },
-    organization: {
+    expensesField: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Organization"
-    },
+    }],
     role: {
         type: String, // accountant, co-accontant,member
         // required: true
@@ -50,9 +50,11 @@ userSchema.methods.getResetToken = function () {
 
 userSchema.statics.findByEmail = async (req, res) => {
     const { email } = req.body
+
     const checkEmail = await userModel.findOne({ email });
+
     if (checkEmail) {
-        return res.status(202).json({ message: "User already exist" })
+        return checkEmail
     }
     return false;
 }
