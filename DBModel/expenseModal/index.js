@@ -14,7 +14,7 @@ const expensesSchema = new mongoose.Schema(
         },
         qyt: {
             type: Number,
-
+            default: 1
         },
         price: {
             type: Number,

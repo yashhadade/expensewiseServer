@@ -4,15 +4,14 @@ import mongoose from "mongoose";
 const fieldSchema = new mongoose.Schema({
     fieldName: {
         type: String,
-
     },
-    expenses: [{
-        expensesId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "expenses"
-        }
-    }],
-    userId: {
+    RecivedAmount: {
+        type: String,
+    },
+    balance: {
+        type: String,
+    },
+        userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user"
     }
