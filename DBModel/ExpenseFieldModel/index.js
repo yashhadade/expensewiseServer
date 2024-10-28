@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { strategies } from "passport";
 
 
 const fieldSchema = new mongoose.Schema({
@@ -11,7 +12,7 @@ const fieldSchema = new mongoose.Schema({
     balance: {
         type: String,
     },
-        userId: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user"
     }
