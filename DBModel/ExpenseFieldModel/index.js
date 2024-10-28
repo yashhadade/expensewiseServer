@@ -7,10 +7,10 @@ const fieldSchema = new mongoose.Schema({
         type: String,
     },
     RecivedAmount: {
-        type: String,
+        type: Number,
     },
     balance: {
-        type: String,
+        type: Number,
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
