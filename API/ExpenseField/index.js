@@ -5,6 +5,7 @@ import { userModel } from "../../DBModel/userModal/index.js";
 import { expenseModal } from "../../DBModel/expenseModal/index.js";
 const Router = express.Router();
 
+// create field
 Router.post("/createField", passport.authenticate("jwt", { session: false }), async (req, res) => {
     try {
         const { _id } = req.user;
@@ -18,6 +19,7 @@ Router.post("/createField", passport.authenticate("jwt", { session: false }), as
 
 })
 
+// get field
 Router.get("/", passport.authenticate("jwt", { session: false }), async (req, res) => {
     const { _id } = req.user;
     const { fieldType } = req.query;
@@ -37,10 +39,11 @@ Router.get("/", passport.authenticate("jwt", { session: false }), async (req, re
 
 })
 
+// add expenses (we have to shift this in expenses api
 Router.post("/add-expense/:fieldId", passport.authenticate("jwt", { session: false }), async (req, res) => {
     const { fieldId } = req.params;
-    const { userId } = req.body
-    req.body.fieldId = fieldId
+    const { _id } = req.user;
+    req.body.fieldId = _id;
 
     const expense = await expenseModal.create(req.body);
 
@@ -57,6 +60,72 @@ Router.post("/add-expense/:fieldId", passport.authenticate("jwt", { session: fal
 })
 
 // https://chatgpt.com/share/672bd7a5-c66c-8001-a453-4757b3f870ce
+
+// create team
+Router.post("/add-members/:fieldId", passport.authenticate("jwt", { session: false }), async (req, res) => {
+    const { fieldId } = req.params;
+    const { emails } = req.body;
+
+    if (!emails || !Array.isArray(emails)) {
+        return res.status(400).json({ message: "Please provide emails in array format" })
+    }
+
+    try {
+        const users = await userModel.find({ email: { $in: emails } })
+
+        const existingUser = users.find(user => user._id);
+        const foundUser = users.find(user => user.email);
+
+        const missingEmail = emails.filter(email => !foundUser.include(email))
+
+        return res.status(200)
+
+    } catch (error) {
+        return res.status(400).json({ message: "somthing went wrong", error })
+    }
+})
+
+// merge expenses into main feild
+Router.post("/team-expenses/:fieldId", passport.authenticate("jwt", { session: false }), async (req, res) => {
+
+
+    const { fieldId } = req.params;
+    const { _id } = req.user;
+    const { myFieldId } = req.body
+    console.log(fieldId, _id);
+
+    try {
+
+
+        const teamField = await ExpensesFieldModel.findById(fieldId);
+
+        if (!teamField) return res.status(404).json({ message: "Feild does not exist" })
+        const myExpenses = await ExpensesFieldModel.findById(_id);
+
+
+        const memberExpenseEntry = allExpenses.membersExpenses.find(me => me.memberId.toString() === _id.toString());
+
+        if (!memberExpenseEntry) {
+            // Step 3: Add a new entry for the member if it doesn't exist
+            await ExpensesFieldModel.findByIdAndUpdate(
+                fieldId,
+                { $push: { membersExpenses: { memberId: _id, expenses: [], status: 'Pending' } } }
+            );
+        }
+
+
+
+        const addExpensesField = await ExpensesFieldModel.findByIdAndUpdate(fieldId,
+            { $push: { "membersExpenses.$[member].expenses": { $each: allExpenses?.expenses } } },
+            { arrayFilters: [{ "member.memberId": _id }], new: true }
+        )
+        return res.status(200).json({ message: "Expenses upated", addExpensesField })
+
+    } catch (error) {
+        return res.status(400).json({ message: error.message })
+
+    }
+})
 
 Router.delete("/:id", passport.authenticate("jwt", { session: false }), async (req, res) => {
     try {
