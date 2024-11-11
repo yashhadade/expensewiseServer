@@ -6,7 +6,8 @@ import bodyParser from "body-parser";
 import expensesAPI from "./API/expenses/index.js"
 import userAPI from "./API/user/index.js";
 import organizationAPI from './API/organization/index.js';
-import expenseFeildAPI from "./API/ExpenseField/index.js"
+import expenseFeildAPI from "./API/ExpenseField/index.js";
+import requestAPI from "./API/Request/index.js";
 import privateConfig from "./Config/routeConfig.js";
 import passport from "passport";
 import session from "express-session";
@@ -30,6 +31,8 @@ app.use("/expenses", expensesAPI);
 app.use("/user", userAPI);
 app.use("/organization", organizationAPI);
 app.use("/field", expenseFeildAPI)
+app.use("/request", requestAPI)
+
 
 app.listen(8000, () => {
     DBConnect().then(() => {

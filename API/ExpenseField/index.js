@@ -96,70 +96,49 @@ Router.post(
 
 // create team
 // todo send request to get in team
-Router.post(
-    "/add-members/:fieldId",
-    passport.authenticate("jwt", { session: false }),
-    async (req, res) => {
-        const { fieldId } = req.params;
-        const { emails } = req.body;
+// Router.post(
+//     "/add-members/:fieldId",
+//     passport.authenticate("jwt", { session: false }),
+//     async (req, res) => {
+//         const { fieldId } = req.params;
+//         const { emails } = req.body;
 
-        if (!emails || !Array.isArray(emails)) {
-            return res
-                .status(400)
-                .json({ message: "Please provide emails in array format" });
-        }
+//         if (!emails || !Array.isArray(emails)) {
+//             return res
+//                 .status(400)
+//                 .json({ message: "Please provide emails in array format" });
+//         }
 
-        try {
-            const users = await userModel.find({ email: { $in: emails } });
+//         try {
+//             const users = await userModel.find({ email: { $in: emails } });
 
-            const existingUser = users.map((user) => user._id);
-            const foundUser = users.map((user) => user.email);
+//             const existingUser = users.map((user) => user._id);
+//             const foundUser = users.map((user) => user.email);
 
-            const missingEmail = emails.filter((email) => !foundUser.includes(email));
+//             const missingEmail = emails.filter((email) => !foundUser.includes(email));
 
-            const field = await ExpensesFieldModel.findByIdAndUpdate(
-                fieldId,
-                {
-                    $addToSet: { members: { $each: existingUser } },
-                },
-                { new: true }
-            );
+//             const field = await ExpensesFieldModel.findByIdAndUpdate(
+//                 fieldId,
+//                 {
+//                     $addToSet: { members: { $each: existingUser } },
+//                 },
+//                 { new: true }
+//             );
 
-            if (missingEmail.length > 0) return res.status(200).json({ message: "Some emails not found in database and others has been added", missingEmail, foundUser })
+//             if (missingEmail.length > 0) return res.status(200).json({ message: "Some emails not found in database and others has been added", missingEmail, foundUser })
 
 
-        } catch (error) {
-            return res
-                .status(400)
-                .json({ message: "somthing went wrong", error: error.message });
-        }
-    }
-);
+//         } catch (error) {
+//             return res
+//                 .status(400)
+//                 .json({ message: "somthing went wrong", error: error.message });
+//         }
+//     }
+// );
 
 // todo api
 // accept request when request accepted that time create field with sanction amout in there and add main field id into team field so it will be get verfied 
 
-// status will change to approve and expenses will added to field expenses list 
-Router.post("/review-Pr/:fieldId", passport.authenticate("jwt", { session: false }), async (req, res) => {
-    const { fieldId } = req.params;
-    const { review, prId } = req.body;
-
-    try {
-        const teamField = await ExpensesFieldModel.findOneAndUpdate({ _id: fieldId, "membersExpenses._id": prId }, {
-            $set: { "membersExpenses.$.status": review }
-        }, { new: true });
-
-        if (!teamField) {
-            return res.status(404).json({ message: "Team field or member expense not found" });
-        }
-
-        return res.status(200).json({ message: "done", teamField })
-
-    } catch (error) {
-        return res.status(400).json({ message: "Somthing went wrong", error: error.message })
-    }
-
-})
 
 // merge expenses into main feild
 Router.post(
@@ -209,6 +188,30 @@ Router.post(
         }
     }
 );
+
+// status will change to approve and expenses will added to field expenses list 
+Router.post("/review-Pr/:fieldId", passport.authenticate("jwt", { session: false }), async (req, res) => {
+    const { fieldId } = req.params;
+    const { review, prId } = req.body;
+
+    try {
+        const teamField = await ExpensesFieldModel.findOneAndUpdate({ _id: fieldId, "membersExpenses._id": prId }, {
+            $set: { "membersExpenses.$.status": review }
+        }, { new: true });
+
+        if (!teamField) {
+            return res.status(404).json({ message: "Team field or member expense not found" });
+        }
+
+        return res.status(200).json({ message: "Field status has been changed", teamField })
+
+    } catch (error) {
+        return res.status(400).json({ message: "Somthing went wrong", error: error.message })
+    }
+
+})
+
+
 
 Router.delete(
     "/:id",
