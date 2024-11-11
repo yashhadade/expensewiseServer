@@ -145,7 +145,7 @@ Router.post(
     "/team-expenses/:fieldId",
     passport.authenticate("jwt", { session: false }),
     async (req, res) => {
-        const { fieldId } = req.params; //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjcxMDE0ZjM4ZmFlNDNlNmY1ZjFhZmRkIiwiaWF0IjoxNzMwNTQwODE5LCJleHAiOjE3MzE0MDQ4MTl9.VBP9eC8HZvsa68t8RQuwSEdbvdiTI6hkJeSY19Sm-9c 2503
+        const { fieldId } = req.params; 
         const { _id } = req.user;
         const { myFieldId } = req.body;
 

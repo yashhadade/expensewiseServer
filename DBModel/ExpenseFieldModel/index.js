@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { strategies } from "passport";
 
 
 const fieldSchema = new mongoose.Schema({
@@ -21,9 +20,17 @@ const fieldSchema = new mongoose.Schema({
         enum: ['Personal', 'Team', 'Home'],
         default: 'Personal'
     },
-    teamFieldId:{type:mongoose.Schema.Types.ObjectId, ref:"Expense"},
+    teamFieldId: { type: mongoose.Schema.Types.ObjectId, ref: "Expense" },
     expenses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Expense" }],
-    members: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
+    members: [
+        {
+            memberId: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+            role: {
+                type: String,
+                default: "member"
+            }
+        },
+    ],
     membersExpenses: [
         {
             memberId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
