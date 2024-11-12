@@ -12,10 +12,6 @@ const expensesSchema = new mongoose.Schema(
             required: true,
 
         },
-        qyt: {
-            type: Number,
-            default: 1
-        },
         price: {
             type: Number,
             required: true
@@ -28,7 +24,7 @@ const expensesSchema = new mongoose.Schema(
                 message: 'Invalid date format, should be YYYY-MM-DD'
             }
         },
-        feildId: {
+        fieldId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "expenseField"
         }
