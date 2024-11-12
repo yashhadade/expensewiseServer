@@ -94,50 +94,6 @@ Router.post(
 
 // https://chatgpt.com/share/672bd7a5-c66c-8001-a453-4757b3f870ce
 
-// create team
-// todo send request to get in team
-// Router.post(
-//     "/add-members/:fieldId",
-//     passport.authenticate("jwt", { session: false }),
-//     async (req, res) => {
-//         const { fieldId } = req.params;
-//         const { emails } = req.body;
-
-//         if (!emails || !Array.isArray(emails)) {
-//             return res
-//                 .status(400)
-//                 .json({ message: "Please provide emails in array format" });
-//         }
-
-//         try {
-//             const users = await userModel.find({ email: { $in: emails } });
-
-//             const existingUser = users.map((user) => user._id);
-//             const foundUser = users.map((user) => user.email);
-
-//             const missingEmail = emails.filter((email) => !foundUser.includes(email));
-
-//             const field = await ExpensesFieldModel.findByIdAndUpdate(
-//                 fieldId,
-//                 {
-//                     $addToSet: { members: { $each: existingUser } },
-//                 },
-//                 { new: true }
-//             );
-
-//             if (missingEmail.length > 0) return res.status(200).json({ message: "Some emails not found in database and others has been added", missingEmail, foundUser })
-
-
-//         } catch (error) {
-//             return res
-//                 .status(400)
-//                 .json({ message: "somthing went wrong", error: error.message });
-//         }
-//     }
-// );
-
-// todo api
-// accept request when request accepted that time create field with sanction amout in there and add main field id into team field so it will be get verfied 
 
 
 // merge expenses into main feild
