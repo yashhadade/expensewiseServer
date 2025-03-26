@@ -16,6 +16,9 @@ const fieldSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "user"
     },
+    duration: {
+        type: String
+    },
     fieldType: {
         type: String,
         enum: ['Personal', 'Team', 'Home'],
@@ -38,7 +41,7 @@ const fieldSchema = new mongoose.Schema({
             expenses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Expense" }],
             status: { type: String, enum: ['Pending', 'Approve', 'Rejected'], default: 'Pending' }
         }
-    ]
+    ],
 
 
 },
