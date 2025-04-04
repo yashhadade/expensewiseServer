@@ -16,7 +16,7 @@ const fieldSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "user"
     },
-    duration: {
+    expiry: {
         type: String
     },
     fieldType: {
@@ -24,8 +24,8 @@ const fieldSchema = new mongoose.Schema({
         enum: ['Personal', 'Team', 'Home'],
         default: 'Personal'
     },
-    teamFieldId: { type: mongoose.Schema.Types.ObjectId, ref: "Expense" },
-    expenses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Expense" }],
+    // teamFieldId: { type: mongoose.Schema.Types.ObjectId, ref: "Expense" },
+    // expenses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Expense" }],
     members: [
         {
             memberId: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
@@ -35,13 +35,13 @@ const fieldSchema = new mongoose.Schema({
             }
         },
     ],
-    membersExpenses: [
-        {
-            memberId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
-            expenses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Expense" }],
-            status: { type: String, enum: ['Pending', 'Approve', 'Rejected'], default: 'Pending' }
-        }
-    ],
+    // membersExpenses: [
+    //     {
+    //         memberId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+    //         expenses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Expense" }],
+    //         status: { type: String, enum: ['Pending', 'Approve', 'Rejected'], default: 'Pending' }
+    //     }
+    // ],
 
 
 },

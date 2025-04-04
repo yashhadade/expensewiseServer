@@ -3,6 +3,8 @@ import passport from "passport";
 import { ExpensesFieldModel } from "../../DBModel/ExpenseFieldModel/index.js";
 import { userModel } from "../../DBModel/userModal/index.js";
 import { expenseModal } from "../../DBModel/expenseModal/index.js";
+import mongoose from "mongoose";
+import { commanExpenseFieldModal } from "../../DBModel/CommanExpenseFieldSchema/index.js";
 const Router = express.Router();
 
 // create field
@@ -62,11 +64,23 @@ Router.get(
   async (req, res) => {
     const { fieldId } = req.params;
     try {
-      const field = await ExpensesFieldModel.findById(fieldId).populate(
-        "expenses"
-      );
 
-      return res.status(200).json({ field });
+      const field = await ExpensesFieldModel.aggregate([
+        {
+          $match: {
+            _id: new mongoose.Types.ObjectId(fieldId)
+          }
+        },
+        {
+          $lookup: {
+            from: "expenses",
+            localField: "_id",
+            foreignField: "fieldId",
+            as: "expenses"
+          }
+        }
+      ])
+      return res.status(200).json({ field: field[0] });
     } catch (error) {
       return res.status(400).json({ message: error.message });
     }
@@ -93,6 +107,7 @@ Router.post(
       });
 
       const field = await ExpensesFieldModel.findById(fieldId);
+      if (!field) return res.status(404).json({ message: "field not found" });
 
       const expenses = await expenseModal.find({ fieldId: fieldId });
 
@@ -108,11 +123,15 @@ Router.post(
         { new: true }
       );
 
-      if (!field) return res.status(404).json({ message: "field not found" });
+      await commanExpenseFieldModal.create({
+        fieldId: fieldId,
+        expenseId: expense._id,
+        userId: _id
+      })
 
       res
         .status(200)
-        .json({ message: "Expenses added successfully", Updatedfield,sucess:true });
+        .json({ message: "Expenses added successfully", Updatedfield, sucess: true });
     } catch (error) {
       return res
         .status(500)
