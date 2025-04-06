@@ -28,10 +28,6 @@ const expensesSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "expenseField"
         },
-        userId:{
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"users"
-        }
     }
 )
 

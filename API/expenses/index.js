@@ -1,4 +1,5 @@
-import { commanExpenseFieldModal } from "../../DBModel/CommanExpenseFieldSchema/index.js";
+
+import mongoose from "mongoose";
 import { ExpensesFieldModel } from "../../DBModel/ExpenseFieldModel/index.js";
 import { expenseModal } from "../../DBModel/expenseModal/index.js";
 import express from "express";
@@ -13,11 +14,6 @@ Router.post("/:id/addexpense", passport.authenticate("jwt", { session: false }),
         if (!feildExist) return res.status(404).json({ message: "Feild not found first create feild" })
         req.body.feildId = id;
         const newExpense = await expenseModal.create(req.body);
-        await commanExpenseFieldModal.create({
-            fieldId: id,
-            expenseId: newExpense._id,
-            userId: req.user._id
-        })
         return res.status(201).json({ status: "expense Created", newExpense })
     } catch (error) {
         return res.status(400).json({ status: "somthing went wrong", error: error.message })
@@ -31,7 +27,7 @@ Router.get("/:id", async (req, res) => {
         if (!fieldExist) return res.status(404).json({ message: "Feild not found first create feild" })
 
 
-        const expensesList = await expenseModal.find({ feildId: id });
+        const expensesList = await expenseModal.find({ fieldId: new mongoose.Types.ObjectId(id) });
 
         return res.status(201).json({ expensesList })
     } catch (error) {

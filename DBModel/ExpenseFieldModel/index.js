@@ -21,7 +21,7 @@ const fieldSchema = new mongoose.Schema({
     },
     fieldType: {
         type: String,
-        enum: ['Personal', 'Team', 'Home'],
+        enum: ['Personal', 'Team', 'Home','Primary'],
         default: 'Personal'
     },
     // teamFieldId: { type: mongoose.Schema.Types.ObjectId, ref: "Expense" },
@@ -42,8 +42,7 @@ const fieldSchema = new mongoose.Schema({
     //         status: { type: String, enum: ['Pending', 'Approve', 'Rejected'], default: 'Pending' }
     //     }
     // ],
-
-
+ 
 },
     { timestamps: true }
 )

@@ -4,7 +4,6 @@ import { ExpensesFieldModel } from "../../DBModel/ExpenseFieldModel/index.js";
 import { userModel } from "../../DBModel/userModal/index.js";
 import { expenseModal } from "../../DBModel/expenseModal/index.js";
 import mongoose from "mongoose";
-import { commanExpenseFieldModal } from "../../DBModel/CommanExpenseFieldSchema/index.js";
 const Router = express.Router();
 
 // create field
@@ -41,8 +40,12 @@ Router.get(
 
       // Add fieldType to query if it is present
       if (fieldType) {
-        query.fieldType = fieldType;
+        query.fieldType = fieldType
       }
+      else if (fieldType !== "Primary") {
+        query.fieldType = { $ne: "Primary" };
+      }
+      console.log(query);
 
       const expenseField = await ExpensesFieldModel.find(query);
 
@@ -122,13 +125,6 @@ Router.post(
         },
         { new: true }
       );
-
-      await commanExpenseFieldModal.create({
-        fieldId: fieldId,
-        expenseId: expense._id,
-        userId: _id
-      })
-
       res
         .status(200)
         .json({ message: "Expenses added successfully", Updatedfield, sucess: true });
