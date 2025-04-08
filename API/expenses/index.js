@@ -63,4 +63,39 @@ Router.put("/udpateExpense/:id", async (req, res) => {
     }
 })
 
+Router.post('/mergeExpense', async (req, res) => {
+    try {
+        const { expenseList, fieldId } = req.body;
+        if (!expenseList || !fieldId) return res.status(500).json({ message: "Invalid data" })
+
+            const createdExpenses = await Promise.all(
+                expenseList.map(async (id) => {
+                    const existingExpense = await expenseModal.findById(id);
+        
+                    if (!existingExpense) {
+                        throw new Error(`Expense with ID ${id} not found`);
+                    }
+        
+                    // Destructure only the needed fields to avoid copying unwanted metadata
+                    const { desc, category, date, price } = existingExpense;
+        
+                    // Create a new expense with a new fieldId
+                    return expenseModal.create({
+                        desc,
+                        category,
+                        date,
+                        price,
+                        fieldId, // new fieldId
+                    });
+                })
+            );
+        res.status(200).json({ message: "Expenses merged successfully", success: true })
+
+    } catch (error) {
+        console.log("error while merging expsnes", error);
+
+        return res.status(400).json({ status: "Somthing went wrong", error: error.message })
+    }
+})
+
 export default Router
