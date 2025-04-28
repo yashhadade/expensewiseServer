@@ -16,6 +16,7 @@ import session from "express-session";
 dotenv.config();
 
 const app = express();
+app.get("/", (req, res) => res.redirect('https://expensewisee.vercel.app/'));
 privateConfig(passport);
 app.use(express.json());
 const corsOptions = {
@@ -32,10 +33,6 @@ app.use("/user", userAPI);
 app.use("/organization", organizationAPI);
 app.use("/field", expenseFeildAPI)
 app.use("/request", requestAPI)
-
-app.use("/", (req, res) => {
-    res.redirect('https://expensewisee.vercel.app/');
-})
 
 app.listen(8000, () => {
     DBConnect().then(() => {
