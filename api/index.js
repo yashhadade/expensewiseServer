@@ -41,8 +41,14 @@ app.use("/organization", organizationAPI);
 app.use("/field", expenseFeildAPI);
 app.use("/request", requestAPI);
 
+try {
+    await DBConnect(); // Ensure DB connection happens once function is called
+    console.log("connected to database");
 
-await DBConnect(); // Ensure DB connection happens once function is called
+} catch (error) {
+    console.log("Error while connecting DB", error);
+
+}
 
 export default serverless(app); // ✅ correct
 
