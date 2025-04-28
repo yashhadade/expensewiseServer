@@ -25,7 +25,12 @@ const corsOptions = {
     optionSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
-app.use(session({ secret: "newProject" }));
+app.use(session({
+    secret: "newProject",
+    resave: false,
+    saveUninitialized: false
+}));
+
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => res.redirect('https://expensewisee.vercel.app/'));
@@ -37,4 +42,7 @@ app.use("/field", expenseFeildAPI);
 app.use("/request", requestAPI);
 
 
-export const handler = serverless(app); // Export this!
+await DBConnect(); // Ensure DB connection happens once function is called
+
+export default serverless(app); // ✅ correct
+
