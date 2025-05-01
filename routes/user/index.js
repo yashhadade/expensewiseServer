@@ -148,6 +148,8 @@ Router.put('/AddOrg', passport.authenticate("jwt", { session: false }), async (r
 Router.post("/auth", async (req, res) => {
   try {
     const user = await userModel.findByEmail(req, res);
+    // console.log(user);
+
     if (!user) {
       const newUser = await userModel.create(req.body);
       const token = newUser.genrateJwtToken();

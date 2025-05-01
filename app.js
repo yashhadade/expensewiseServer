@@ -3,11 +3,11 @@ import dotenv from "dotenv";
 import DBConnect from "./DBModel/DBConnection.js"
 import cors from "cors";
 import bodyParser from "body-parser";
-import expensesAPI from "./API/expenses/index.js"
-import userAPI from "./API/user/index.js";
-import organizationAPI from './API/organization/index.js';
-import expenseFeildAPI from "./API/ExpenseField/index.js";
-import requestAPI from "./API/Request/index.js";
+import expensesAPI from "./routes/expenses/index.js"
+import userAPI from "./routes/user/index.js";
+import organizationAPI from './routes/organization/index.js';
+import expenseFeildAPI from "./routes/ExpenseField/index.js";
+import requestAPI from "./routes/Request/index.js";
 import privateConfig from "./Config/routeConfig.js";
 import passport from "passport";
 import session from "express-session";
