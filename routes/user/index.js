@@ -36,7 +36,7 @@ async function addUSerToOrg(userID) {
 
 Router.post("/signup", async (req, res) => {
   try {
-    // console.log(req.body);
+    console.log(req.body);
 
     await userModel.findByEmail(req, res);
     const newUser = await userModel.create(req.body);

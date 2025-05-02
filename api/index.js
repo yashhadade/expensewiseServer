@@ -25,22 +25,49 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(session({ secret: "newProject" }));
-app.use(bodyParser.json());
+app.use(session({
+    secret: "newProject",
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '6mb' }));
+app.use((req, res, next) => {
+    console.log(`Received request with body size: ${JSON.stringify(req.body).length} bytes`);
+    next();
+});
+
 app.use("/expenses", expensesAPI);
 app.use("/user", userAPI);
 app.use("/organization", organizationAPI);
 app.use("/field", expenseFeildAPI)
 app.use("/request", requestAPI)
 
-// app.use("/", (req, res) => {
-//     res.redirect('https://expensewisee.vercel.app/');
-// })
+app.use(async (req, res, next) => {
+    try {
+        console.log("connecting to DB");
 
-DBConnection().then(() => {
-    console.log("✅ DB Connected");
-}).catch((error) => {
-    console.error("❌ DB Connection Error:", error);
+        await DBConnection(); // Make sure you cache the connection inside this function
+        console.log("connected");
+
+        next();
+    } catch (err) {
+        console.error("❌ DB Connect error:", err);
+        res.status(500).json({ error: "DB connection failed" });
+    }
+});
+app.get("/ping", (req, res) => {
+    console.log("pingggggggg");
+
+    res.send("pong");
 });
 
-export const handler = serverless(app);
+app.get('/', function (req, res) {
+    console.log("hellosssss");
+
+    res.send("hello")
+    // res.json({ message: "hello" })
+});
+
+app.listen(8000, () => console.log('Server ready on port 8000.'));
+export default serverless(app);

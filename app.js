@@ -35,8 +35,11 @@ app.use("/request", requestAPI)
 
 app.use("/", (req, res) => {
     res.redirect('https://expensewisee.vercel.app/');
+    res.send("redirectd")
 })
-
+app.get("/ping", (req, res) => {
+    res.send("pong");
+});
 app.listen(8000, () => {
     DBConnect().then(() => {
         console.log("server connected");
