@@ -11,7 +11,7 @@ import privateConfig from "../Config/routeConfig.js";
 import passport from "passport";
 import session from "express-session";
 import DBConnection from "../DBModel/DBConnection.js";
-
+import serverless from "serverless-http";
 
 dotenv.config();
 
@@ -33,17 +33,14 @@ app.use("/organization", organizationAPI);
 app.use("/field", expenseFeildAPI)
 app.use("/request", requestAPI)
 
-app.use("/", (req, res) => {
-    res.redirect('https://expensewisee.vercel.app/');
-})
+// app.use("/", (req, res) => {
+//     res.redirect('https://expensewisee.vercel.app/');
+// })
 
-app.listen(8000, () => {
-    DBConnection().then(() => {
-        console.log("server connected");
-    }).catch((error) => {
-        console.error(error);
-    })
-    console.log(`Server Started at ${8000}`)
-})
+DBConnection().then(() => {
+    console.log("✅ DB Connected");
+}).catch((error) => {
+    console.error("❌ DB Connection Error:", error);
+});
 
-export default app;
+export const handler = serverless(app);
