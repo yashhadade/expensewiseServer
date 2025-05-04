@@ -2,6 +2,7 @@ import { userModel } from "../../DBModel/userModal/index.js";
 import express from "express"
 import passport from "passport";
 import { organizationModel } from "../../DBModel/organizationModal/index.js";
+import bcrypt from "bcrypt";
 
 const Router = express.Router();
 
@@ -36,9 +37,10 @@ async function addUSerToOrg(userID) {
 
 Router.post("/signup", async (req, res) => {
   try {
-    console.log(req.body);
-
-    await userModel.findByEmail(req, res);
+    const emailExist = await userModel.findByEmail(req, res);
+    if (emailExist !== undefined) {
+      return res.status(401).json({ message: "User already exist", success: false })
+    }
     const newUser = await userModel.create(req.body);
 
     if (newUser.organization) {
@@ -47,23 +49,60 @@ Router.post("/signup", async (req, res) => {
 
     const token = newUser.genrateJwtToken();
 
-    return res.status(201).json({ status: "Success", token })
+    return res.status(201).json({ status: "Success", token, success: true })
   } catch (error) {
-    return res.status(400).json({ status: "Failed", error: error.message })
+    return res.status(400).json({ status: "Failed", error: error.message, success: false })
   }
 })
 
 Router.post("/signin", async (req, res) => {
   try {
-    const user = await userModel.findByEmailAndPass(req.body);
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required.",
+      });
+    }
+    const user = await userModel.findByEmailAndPass(email, password);
+
     const token = user.genrateJwtToken();
 
-    return res.status(201).json({ status: "Success", token })
+    return res.status(200).json({
+      success: true,
+      token,
+      user: {
+        name: user.name,
+        email: user.email,
+        userId: user._id,
+      },
+    });
 
   } catch (error) {
-    return res.status(400).json({ status: "Failed", error: error.message })
+    const message = error.message;
+
+    if (message === "USER_NOT_FOUND") {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    if (message === "INVALID_CREDENTIALS") {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password.",
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong. Please try again.",
+    });
   }
-})
+});
+
 
 Router.get("/getUser", passport.authenticate("jwt", { session: false }), async (req, res) => {
   try {

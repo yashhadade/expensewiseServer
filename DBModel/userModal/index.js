@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import bcrypt from "bcryptjs";
 
 
 const userSchema = new mongoose.Schema({
@@ -52,11 +52,11 @@ userSchema.statics.findByEmail = async (req, res) => {
     const { email } = req.body
 
     const checkEmail = await userModel.findOne({ email });
-
     if (checkEmail) {
         return checkEmail
+
     }
-    return false;
+    return;
 }
 
 userSchema.methods.matchPassword = function (oldPassword, callback) {
@@ -66,17 +66,15 @@ userSchema.methods.matchPassword = function (oldPassword, callback) {
     })
 }
 
-userSchema.statics.findByEmailAndPass = async ({ email, password }) => {
-    const user = await userModel.findOne({ email });
-    if (!user) throw new Error("user not exist");
+userSchema.statics.findByEmailAndPass = async function (email, password) {
+    const user = await this.findOne({ email });
+    if (!user) throw new Error("USER_NOT_FOUND");
 
-    const checkPassword = await bcrypt.compare(password, user.password);
-    if (!checkPassword) {
-        throw new Error("invalid credentials")
-    }
+    const isMatch = await bcrypt.compare(String(password), String(user.password));
+    if (!isMatch) throw new Error("INVALID_CREDENTIALS");
     return user;
 };
-
+// hashing password here
 userSchema.pre("save", function (next) {
     const user = this;
     if (!user.isModified("password")) return next();
