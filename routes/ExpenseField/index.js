@@ -83,7 +83,7 @@ Router.get(
           }
         }
       ])
-      return res.status(200).json({ field: field[0] });
+      return res.status(200).json({ field: field[0], sucess: true, message: "Fetched expense list by field id" });
     } catch (error) {
       return res.status(400).json({ message: error.message });
     }
@@ -113,18 +113,29 @@ Router.post(
       if (!field) return res.status(404).json({ message: "field not found" });
 
       const expenses = await expenseModal.find({ fieldId: fieldId });
+      let Updatedfield;
+      if (field.fieldType !== "Primary") {
+        const totalExpenses = expenses.reduce((acc, exp) => acc + exp.price, 0);
+        const currentBalance = field.RecivedAmount - totalExpenses;
 
-      const totalExpenses = expenses.reduce((acc, exp) => acc + exp.price, 0);
-      const currentBalance = field.RecivedAmount - totalExpenses;
+        Updatedfield = await ExpensesFieldModel.findByIdAndUpdate(
+          fieldId,
+          {
+            balance: currentBalance,
+          },
+          { new: true }
+        );
+      } else {
+        const totalExpenses = expenses.reduce((acc, exp) => acc + exp.price, 0);
 
-      const Updatedfield = await ExpensesFieldModel.findByIdAndUpdate(
-        fieldId,
-        {
-          balance: currentBalance,
-          $push: { expenses: expense._id },
-        },
-        { new: true }
-      );
+        Updatedfield = await ExpensesFieldModel.findByIdAndUpdate(
+          fieldId,
+          {
+            RecivedAmount: totalExpenses,
+          },
+          { new: true }
+        );
+      }
       res
         .status(200)
         .json({ message: "Expenses added successfully", Updatedfield, sucess: true });
