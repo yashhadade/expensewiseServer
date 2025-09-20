@@ -75,6 +75,7 @@ Router.post("/signin", async (req, res) => {
       user: {
         name: user.name,
         email: user.email,
+        phoneNo: user.phoneNo,
         userId: user._id,
       },
     });

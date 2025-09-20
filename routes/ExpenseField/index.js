@@ -16,9 +16,11 @@ Router.post(
       req.body.userId = _id;
 
       const response = await ExpensesFieldModel.create(req.body);
-      return res.status(200).json({ message: "field created", response });
+      return res
+        .status(200)
+        .json({ message: "field created", response, success: true });
     } catch (error) {
-      return res.status(400).json({ message: error.message });
+      return res.status(400).json({ message: error.message, sucess: false });
     }
   }
 );
@@ -30,7 +32,6 @@ Router.get(
   async (req, res) => {
     const { _id } = req.user;
     const { fieldType } = req.query;
-
     try {
       const userExist = await userModel.findById(_id);
       if (!userExist)
@@ -39,20 +40,22 @@ Router.get(
       const query = { userId: _id };
 
       // Add fieldType to query if it is present
-      if (fieldType) {
-        query.fieldType = fieldType
-      }
-      else if (fieldType !== "Primary") {
+      if (fieldType !== "undefined" && fieldType) {
+        query.fieldType = fieldType;
+      } else if (
+        fieldType !== "Primary" ||
+        fieldType !== "undefined" ||
+        fieldType !== undefined
+      ) {
         query.fieldType = { $ne: "Primary" };
       }
-      console.log(query);
 
       const expenseField = await ExpensesFieldModel.find(query);
 
       if (expenseField.length === 0)
         return res.status(404).json({ message: "Add Expese field " });
 
-      return res.status(202).json({ expenseField });
+      return res.status(202).json({ expenseField, success: true });
     } catch (error) {
       return res.status(400).json({ message: error.message });
     }
@@ -67,23 +70,28 @@ Router.get(
   async (req, res) => {
     const { fieldId } = req.params;
     try {
-
       const field = await ExpensesFieldModel.aggregate([
         {
           $match: {
-            _id: new mongoose.Types.ObjectId(fieldId)
-          }
+            _id: new mongoose.Types.ObjectId(fieldId),
+          },
         },
         {
           $lookup: {
             from: "expenses",
             localField: "_id",
             foreignField: "fieldId",
-            as: "expenses"
-          }
-        }
-      ])
-      return res.status(200).json({ field: field[0], sucess: true, message: "Fetched expense list by field id" });
+            as: "expenses",
+          },
+        },
+      ]);
+      return res
+        .status(200)
+        .json({
+          field: field[0],
+          success: true,
+          message: "Fetched expense list by field id",
+        });
     } catch (error) {
       return res.status(400).json({ message: error.message });
     }
@@ -138,7 +146,11 @@ Router.post(
       }
       res
         .status(200)
-        .json({ message: "Expenses added successfully", Updatedfield, sucess: true });
+        .json({
+          message: "Expenses added successfully",
+          Updatedfield,
+          sucess: true,
+        });
     } catch (error) {
       return res
         .status(500)
@@ -146,6 +158,77 @@ Router.post(
     }
   }
 );
+
+Router.post(
+  "/add-fixed-expenses",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const { desc, category, price, date } = req.body;
+    const { _id: userId } = req.user;
+
+    try {
+      // Find existing Primary ExpensesField or create one
+      let expenseField = await ExpensesFieldModel.findOne({ userId, fieldType: "Primary" });
+      if (!expenseField) {
+        expenseField = await ExpensesFieldModel.create({
+          fieldName: "Fixed expense",
+          fieldType: "Primary",
+          userId,
+          RecivedAmount: '',
+        });
+      }
+
+      // Create new expense linked to the Primary expense field
+      const expense = await expenseModal.create({
+        desc,
+        category,
+        price,
+        date,
+        fieldId: expenseField._id,
+      });
+
+      const field = await ExpensesFieldModel.findById( expenseField._id);
+      if (!field) return res.status(404).json({ message: "field not found" });
+
+      const expenses = await expenseModal.find({ fieldId:  expenseField._id });
+      let Updatedfield;
+      if (field.fieldType !== "Primary") {
+        const totalExpenses = expenses.reduce((acc, exp) => acc + exp.price, 0);
+        const currentBalance = field.RecivedAmount - totalExpenses;
+
+        Updatedfield = await ExpensesFieldModel.findByIdAndUpdate(
+          expenseField._id,
+          {
+            balance: currentBalance,
+          },
+          { new: true }
+        );
+      } else {
+        const totalExpenses = expenses.reduce((acc, exp) => acc + exp.price, 0);
+
+        Updatedfield = await ExpensesFieldModel.findByIdAndUpdate(
+          expenseField._id,
+          {
+            RecivedAmount: totalExpenses,
+          },
+          { new: true }
+        );
+      }
+      res
+        .status(200)
+        .json({
+          message: "Expenses added successfully",
+          Updatedfield,
+          success: true,
+        });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ messsage: "Somthing went wrong", error: error.message });
+    }
+  }
+);
+
 
 // https://chatgpt.com/share/672bd7a5-c66c-8001-a453-4757b3f870ce
 
