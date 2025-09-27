@@ -43,5 +43,5 @@ app.listen(3000, "0.0.0.0",() => {
     }).catch((error) => {
         console.error(error);
     })
-    console.log(`Server Started at ${8000}`)
+    console.log(`Server Started at ${3000}`)
 })
