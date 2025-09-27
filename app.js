@@ -37,7 +37,7 @@ app.use("/", (req, res) => {
     res.redirect('https://expensewisee.vercel.app/');
 })
 
-app.listen(8000, "0.0.0.0",() => {
+app.listen(3000, "0.0.0.0",() => {
     DBConnect().then(() => {
         console.log("server connected");
     }).catch((error) => {
