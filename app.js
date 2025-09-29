@@ -33,9 +33,9 @@ app.use("/organization", organizationAPI);
 app.use("/field", expenseFeildAPI)
 app.use("/request", requestAPI)
 
-app.use("/", (req, res) => {
-    res.redirect('https://expensewisee.vercel.app/');
-})
+// app.use("/", (req, res) => {
+//     res.redirect('https://expensewisee.vercel.app/');
+// })
 
 app.listen(3000, "0.0.0.0",() => {
     DBConnect().then(() => {
