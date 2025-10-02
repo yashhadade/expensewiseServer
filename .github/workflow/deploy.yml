@@ -10,8 +10,8 @@ push:
      name:Deploying the backend to ec2
      runs-on: ubuntu-latest
     steps:
-      -name:SSH Into server
-      -run :|
+      name:SSH Into server
+      run :|
         echo ${{secrets.SSH_SECRETE_KEY}} & > ~/ssh_key
         ssh -i ~/ssh_key ubuntu@13.233.166.229
         cd expensewiseServer /&& git pull
