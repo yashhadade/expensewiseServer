@@ -33,15 +33,19 @@ app.use("/organization", organizationAPI);
 app.use("/field", expenseFeildAPI)
 app.use("/request", requestAPI)
 
-app.use("/", (req, res) => {
-    res.redirect('https://expensewisee.vercel.app/');
-})
+// app.use("/", (req, res) => {
+//     res.redirect('https://expensewisee.vercel.app/');
+// })
+app.get('/', (req, res) => {
+  res.send('Backend is running!');
+});
 
-app.listen(8000, "0.0.0.0",() => {
+
+app.listen(3000, "0.0.0.0",() => {
     DBConnect().then(() => {
         console.log("server connected");
     }).catch((error) => {
         console.error(error);
     })
-    console.log(`Server Started at ${8000}`)
+    console.log(`Server Started at ${3000}`)
 })
