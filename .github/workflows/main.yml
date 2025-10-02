@@ -18,6 +18,11 @@ jobs:
           echo "${{ secrets.SSH_SECRETE_KEY }}" > ~/.ssh/expensewise.pem
           chmod 600 ~/.ssh/expensewise.pem
 
+      - name: Add EC2 to known_hosts
+        run: |
+          ssh-keyscan -H 52.66.246.32 >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
       - name: Deploy to EC2
         run: |
           ssh -i ~/.ssh/expensewise.pem ubuntu@52.66.246.32 << 'EOF'
@@ -25,5 +30,5 @@ jobs:
             git pull origin main
             export PATH=/root/.nvm/versions/node/v22.13.1/bin:$PATH
             npm install
-            npm run start
+            nohup npm run start > server.log 2>&1 &
           EOF
