@@ -15,12 +15,12 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_SECRETE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_SECRETE_KEY }}" > ~/.ssh/expensewise.pem
+          chmod 600 ~/.ssh/expensewise.pem
 
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa ubuntu@52.66.246.32 << 'EOF'
+          ssh -i ~/.ssh/expensewise.pem ubuntu@52.66.246.32 << 'EOF'
             cd expensewiseServer
             git pull origin main
             export PATH=/root/.nvm/versions/node/v22.13.1/bin:$PATH
