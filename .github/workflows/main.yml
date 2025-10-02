@@ -1,4 +1,4 @@
-name: Deploy to staging
+name: Deploy to main
 on:
   push:
     branches: [ main ]
@@ -6,13 +6,24 @@ on:
 jobs:
   redeploy_everything:
     runs-on: ubuntu-latest
-    name: Deploying everything to the staging cluster
+    name: Deploying everything to the main cluster
+
     steps:
-      - run: |
-          echo "${{ secrets.SSH_SECRETE_KEY }}" &> ~/ssh_key
-          mkdir -p /home/runner/.ssh
-          ls /home/runner/.ssh
-          touch /home/runner/.ssh/known_hosts
-          echo "${{ secrets.KNOWN_HOSTS }}" &> /home/runner/.ssh/known_hosts
-          chmod 700 /home/runner/ssh_key
-          ssh -i ~/ssh_key ubuntu@52.66.246.32 -t "cd expensewiseServer/ && git pull origin main && export PATH=/root/.nvm/versions/node/v22.13.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin && npm install && npm run start"
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_SECRETE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa ubuntu@52.66.246.32 << 'EOF'
+            cd expensewiseServer
+            git pull origin main
+            export PATH=/root/.nvm/versions/node/v22.13.1/bin:$PATH
+            npm install
+            npm run start
+          EOF
