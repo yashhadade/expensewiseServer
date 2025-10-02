@@ -6,6 +6,7 @@ push:
     - main
  
   jobs:
+    uses:ubuntu-latest
     redeploy_backend:
      name:Deploying the backend to ec2
 
