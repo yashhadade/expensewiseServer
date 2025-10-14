@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import bcrypt from "bcryptjs";
 
 
 const userSchema = new mongoose.Schema({
@@ -60,17 +59,30 @@ userSchema.statics.findByEmail = async (req, res) => {
 }
 
 userSchema.methods.matchPassword = function (oldPassword, callback) {
-    bcrypt.compare(oldPassword, this.password, (error, isMatch) => {
-        if (error) callback(error);
-        callback(null, isMatch);
-    })
+    try {
+        const [salt, hash] = this.password.split(':');
+        crypto.scrypt(oldPassword, salt, 64, (error, derivedKey) => {
+            if (error) return callback(error);
+            const isMatch = crypto.timingSafeEqual(Buffer.from(hash, 'hex'), derivedKey);
+            callback(null, isMatch);
+        });
+    } catch (error) {
+        callback(error);
+    }
 }
 
 userSchema.statics.findByEmailAndPass = async function (email, password) {
     const user = await this.findOne({ email });
     if (!user) throw new Error("USER_NOT_FOUND");
 
-    const isMatch = await bcrypt.compare(String(password), String(user.password));
+    const [salt, hash] = user.password.split(':');
+    const derivedKey = await new Promise((resolve, reject) => {
+        crypto.scrypt(String(password), salt, 64, (error, key) => {
+            if (error) reject(error);
+            else resolve(key);
+        });
+    });
+    const isMatch = crypto.timingSafeEqual(Buffer.from(hash, 'hex'), derivedKey);
     if (!isMatch) throw new Error("INVALID_CREDENTIALS");
     return user;
 };
@@ -79,17 +91,13 @@ userSchema.pre("save", function (next) {
     const user = this;
     if (!user.isModified("password")) return next();
 
-
-    bcrypt.genSalt(8, (error, salt) => {
+    const salt = crypto.randomBytes(16).toString('hex');
+    crypto.scrypt(user.password, salt, 64, (error, derivedKey) => {
         if (error) return next(error);
 
-        bcrypt.hash(user.password, salt, (error, hash) => {
-            if (error) return next(error);
-
-            user.password = hash;
-            return next();
-        })
-    })
+        user.password = `${salt}:${derivedKey.toString('hex')}`;
+        return next();
+    });
 })
 
 export const userModel = mongoose.model("User", userSchema);

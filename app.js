@@ -1,17 +1,16 @@
 import express from "express";
 import dotenv from "dotenv";
-import DBConnect from "./DBModel/DBConnection.js"
+import DBConnect from "./app/DBModel/DBConnection.js"
 import cors from "cors";
 import bodyParser from "body-parser";
-import expensesAPI from "./routes/expenses/index.js"
-import userAPI from "./routes/user/index.js";
-import organizationAPI from './routes/organization/index.js';
-import expenseFeildAPI from "./routes/ExpenseField/index.js";
-import requestAPI from "./routes/Request/index.js";
-import privateConfig from "./Config/routeConfig.js";
+import expensesAPI from "./app/routes/expenses/index.js"
+import userAPI from "./app/routes/user/index.js";
+import organizationAPI from './app/routes/organization/index.js';
+import expenseFeildAPI from "./app/routes/ExpenseField/index.js";
+import requestAPI from "./app/routes/Request/index.js";
+import privateConfig from "./app/Config/routeConfig.js";
 import passport from "passport";
 import session from "express-session";
-
 
 dotenv.config();
 
@@ -37,11 +36,11 @@ app.use("/request", requestAPI)
 //     res.redirect('https://expensewisee.vercel.app/');
 // })
 app.get('/', (req, res) => {
-  res.send('Yedzav !! Backend is running!');
+  res.send('Backend is running!');
 });
 
 
-app.listen(3000, "0.0.0.0",() => {
+app.listen(5000, "0.0.0.0",() => {
     DBConnect().then(() => {
         console.log("server connected");
     }).catch((error) => {

@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
 const organizationSchema = new mongoose.Schema({
@@ -50,38 +49,50 @@ organizationSchema.statics.findByEmail = async ({ email }) => {
 }
 
 organizationSchema.methods.matchPassword = function (oldPassword, callback) {
-    bcrypt.compare(oldPassword, this.password, (error, isMatch) => {
-        if (error) callback(error);
-        callback(null, isMatch);
-    })
-}
+    try {
+      const [salt, originalHash] = this.password.split(":");
+      const hash = crypto
+        .pbkdf2Sync(oldPassword, salt, 10000, 64, "sha512")
+        .toString("hex");
+  
+      const isMatch = hash === originalHash;
+      callback(null, isMatch);
+    } catch (err) {
+      callback(err);
+    }
+  };
 
-organizationSchema.statics.findByEmailAndPass = async ({ email, password }) => {
+  organizationSchema.statics.findByEmailAndPass = async ({ email, password }) => {
     const org = await organizationModel.findOne({ email });
     if (!org) throw new Error("Organization not exist");
-
-    const checkPassword = await bcrypt.compare(password, org.password);
-    if (!checkPassword) {
-        throw new Error("invalid credentials")
+  
+    try {
+      // Split salt and hash stored in DB
+      const [salt, originalHash] = org.password.split(":");
+      // Recompute hash from provided password
+      const hash = crypto
+        .pbkdf2Sync(password, salt, 10000, 64, "sha512")
+        .toString("hex");
+  
+      if (hash !== originalHash) {
+        throw new Error("Invalid credentials");
+      }
+  
+      return org;
+    } catch (err) {
+      throw new Error("Invalid credentials");
     }
-    return org;
-};
-
+  };
 organizationSchema.pre("save", function (next) {
     const org = this;
     if (!org.isModified("password")) return next();
+    const salt = crypto.randomBytes(16).toString("hex");
+    const hash = crypto
+      .pbkdf2Sync(org.password, salt, 10000, 64, "sha512")
+      .toString("hex");
 
-
-    bcrypt.genSalt(8, (error, salt) => {
-        if (error) return next(error);
-
-        bcrypt.hash(org.password, salt, (error, hash) => {
-            if (error) return next(error);
-
-            org.password = hash;
-            return next();
-        })
-    })
+    org.password = `${salt}:${hash}`; // Store "salt:hash"
+    next();
 })
 
 

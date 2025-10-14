@@ -2,7 +2,6 @@ import { userModel } from "../../DBModel/userModal/index.js";
 import express from "express"
 import passport from "passport";
 import { organizationModel } from "../../DBModel/organizationModal/index.js";
-import bcrypt from "bcrypt";
 
 const Router = express.Router();
 

@@ -3,7 +3,6 @@ import { userModel } from "../../DBModel/userModal/index.js";
 import passport from "passport";
 import { RequestModel } from "../../DBModel/RequestModel/index.js";
 import { ExpensesFieldModel } from "../../DBModel/ExpenseFieldModel/index.js";
-import { expenseModal } from "../../DBModel/expenseModal/index.js";
 
 const Router = express.Router();
 
