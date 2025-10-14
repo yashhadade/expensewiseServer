@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-expensewise
+    networks:
+      - expensewise-network
+    ports:
+      - "27017:27017"
+
+  expensewise-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: expensewise-server
+    networks:
+      - expensewise-network
+    ports:
+      - "3000:3000"
+    environment:
+      - env   
+
+networks:
+  expensewise-network:
+    driver: bridge
+    # depends_on:
+    #   - mongodb
