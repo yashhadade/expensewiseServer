@@ -36,7 +36,7 @@ app.use("/request", requestAPI)
 //     res.redirect('https://expensewisee.vercel.app/');
 // })
 app.get('/', (req, res) => {
-  res.send('Backend is running!');
+  res.send('HIIII the backend is Runnibg !');
 });
 
 

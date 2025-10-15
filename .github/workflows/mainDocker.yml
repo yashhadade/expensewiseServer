@@ -61,3 +61,28 @@ jobs:
             MONGODB=${{ secrets.MONGODB }}
           push: true
           tags: yashh04/expenseserver:${{ github.sha }}
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_SECRETE_KEY }}" > ~/.ssh/expensewise.pem
+          chmod 600 ~/.ssh/expensewise.pem
+
+      - name: Add EC2 to known_hosts
+        run: |
+          ssh-keyscan -H 13.126.188.240 >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+        
+      - name: Deploy to EC2
+        run: |
+          ssh -i ~/.ssh/expensewise.pem ubuntu@13.126.188.240 << 'EOF'
+            docker stop expense || true
+            docker rm expense || true 
+            docker run -d --name expense -p 3000:3000 yashh04/expenseserver: ${{ github.sha }}
+          EOF
+#             cd expensewiseServer
+#             git pull origin main
+#             export PATH=/root/.nvm/versions/node/v22.13.1/bin:$PATH
+#             npm install
+#             nohup npm run start > server.log 2>&1 &
+#           EOF
