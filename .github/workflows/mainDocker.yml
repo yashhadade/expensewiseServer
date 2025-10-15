@@ -58,6 +58,6 @@ jobs:
           context: .
           file: Dockerfile
           build-args:
-            - MONGODB: ${{ secrets.MONGODB }}
+            MONGODB: ${{ secrets.MONGODB }}
           push: true
           tags: yashh04/expenseserver:${{ github.sha }}
