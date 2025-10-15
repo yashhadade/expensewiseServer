@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
 });
 
 
-app.listen(5000, "0.0.0.0",() => {
+app.listen(3000, "0.0.0.0",() => {
     DBConnect().then(() => {
         console.log("server connected");
     }).catch((error) => {
